@@ -1,0 +1,142 @@
+# DF-CONST-AUTO-EXPANSION Configuration [CRUX-MK]
+# Pro NEUE Konst (z.B. K19+K20+K21+...) automatisch 5 Tier-Vertraege + 50 Begruendungen
+# Pattern-Reuse: DF-TIER-DRIFT-DETECTOR (YAMLExtractor + PythonParser)
+# Build-Trigger: Architekt-autonom 2026-05-09 (Mac Welle-DF-Boost)
+
+df_id: DF-CONST-AUTO-EXPANSION
+df_name: const-auto-expansion
+version: 0.1.0-PHASE-1
+status: PHASE-1-PRODUCTION
+crux-mk: true
+
+description: |
+  Daily-Cadence. Detektiert NEUE Konst-Klassen in klassen_variant_tables.py
+  (z.B. K19, K20, K21+), die noch keine 5-Tier-Vertraege + 50-Klausel-Begruendungen
+  haben. Generiert Skelett-Files via Patcher + Template-Engine.
+
+# === Default-Action (Welle-51 Batch-5 Migration, per Schicht-2 v1.2) ===
+# Migration-Welle: Welle-51 Batch-5
+default_action:
+  description: "Daily-Detection neuer Konst-Klassen in klassen_variant_tables.py + Auto-Generation von 5-Tier-Vertraegen + 50-Klausel-Begruendungs-Skeletten pro neuer Konst"
+  rho_per_run_eur: 70
+  rho_validation_source: unvalidated
+  block_gates:
+    - gate_id: K11
+      block_reason: "Cascade-Isolation verletzt (Template-Engine-Failure auf einer Konst blockiert andere) ODER DLQ-Backlog"
+      false_block_cost_eur: 30
+      legitimate_block_condition: "Template-Engine-Crash der mehrere Konsten gleichzeitig korrumpiert ODER klassen_variant_tables.py malformed"
+    - gate_id: K13_PAV
+      block_reason: "Pre-Action-Check failed (klassen_variant_tables.py SHA256 mismatch ODER Drive-Sync-Lag > 60s)"
+      false_block_cost_eur: 25
+      legitimate_block_condition: "Source-File parallel modified (Race-Condition) ODER Drive nicht gemounted"
+  graceful_degradation_path: "degraded_klausel (Tier-Gen ok, Klausel-Gen failed → Tier-only Skelett) ODER degraded_tier (nur Konst-Verzeichnis) ODER standalone (Inventur-only)"
+
+# === Tier-2 Pflicht-Check ===
+
+tier_2_check:
+  lambda_per_month_estimate: 30   # daily
+  narrow_scope: "Konst-Detection + Tier-Generation + Klausel-Generation"
+  determinism: 0.95
+  rollback_seconds: 5
+  test_coverage_target: 0.95
+  k0_protected: true
+  q0_measurable: true
+  escalation_after_n_fails: 2
+  rho_budget_eur_day: 0
+  audit_trail: branch-hub/audit/df-const-auto-expansion.jsonl
+
+# === K11-K16 Akzeptanz-Kriterien ===
+
+k11_cascade_containment:
+  cascade_isolation: hard
+  failure_blast_radius: 1
+  dependency_dlq_strategy: "pro Konst eigene DLQ wenn Generation failed"
+
+k12_distillation_resistenz:
+  output_feeds_into_training: false
+  provenance_required_in_output: true
+  non_llm_validation_layer: deterministic_template_engine
+
+k13_independent_ground_truth:
+  external_anchor_type: github_filesystem
+  external_anchor_validation_frequency: "pro-Run klassen_variant_tables.py SHA256"
+  pre_action_domain_check:
+    env_tag: "dev/staging/prod"
+    mount_point: "Google-Drive-mount"
+    network_region: "fixed eu-central-1"
+  pre_action_backup_check:
+    backup_status: "Git-Mirror Pflicht VOR write"
+    replication_lag: "< 60s"
+  pre_action_blast_radius_check:
+    blast_radius: "write-skeleton-yamls + audit-log-append"
+    reversibility_class: "side_effect"  # erstellt neue YAML-Files
+
+k14_human_override_decay:
+  override_complexity: single_command
+  override_documentation_freshness_days: 30
+  martin_review_cadence: weekly
+  bus_factor_handover_drilled: false
+
+k15_entropy_budget:
+  entropy_added_loc_estimate: 300
+  entropy_added_concepts:
+    - KonstDetector
+    - TierTemplateEngine
+    - KlauselTemplateEngine
+    - ExpansionRunResult
+  entropy_justified_by_rho: "120k_eur_per_year (Martin-Bandbreite + Auto-Skelett)"
+  entropy_subtractive_potential: "ersetzt manuelles Skelett-Schreiben pro Konst (~4h/Konst)"
+
+k16_concurrent_spawn_mutex:
+  concurrent_spawn_protection: both
+  lock_dir: /tmp/df-const-auto-expansion.lock
+  lock_stale_age_h: 3
+  engine_pgrep_check: true
+  lock_release_on: EXIT_INT_TERM
+
+k11b_pipeline_cost_estimate:
+  pipeline_cost_estimate_required: false
+  cost_estimate_method: static_pre_run
+  quota_budget_ceiling: 0
+  cost_overrun_action: warn
+
+# === LC1-LC5 Lose-Coupling ===
+
+lose_coupling:
+  LC1_graceful_degradation:
+    degradation_modes:
+      - full              # Konst-Detection + Tier-Gen + Klausel-Gen
+      - degraded_klausel  # Tier-Gen ok, Klausel-Gen failed -> Tier-only Skelett
+      - degraded_tier     # Tier-Gen failed -> nur Konst-Verzeichnis erstellt
+      - standalone        # Konst-Detection-only (Inventur-Mode)
+    degradation_test_required: true
+  LC2_direct_mode:
+    direct_mode_available: true
+    direct_mode_capability: 0.5
+    direct_mode_trigger: "template-engine-failure"
+  LC3_circuit_breaker:
+    circuit_breaker_timeout_s: 30
+    circuit_breaker_open_threshold: 3
+    circuit_breaker_half_open_test_interval_s: 300
+  LC4_failure_isolation:
+    state_externalization: true
+    idempotent_operations: true
+    dependency_dlq_separate: true
+  LC5_health_check:
+    health_check_dependencies: []
+    health_check_degraded_score: 0.5
+    health_check_endpoint_or_file: "/tmp/df-const-auto-expansion-health.json"
+
+# === Pfad-Konfiguration ===
+
+paths:
+  python_table_path: "branch-hub/9dots-wargame-system/vertrags-generator/klassen_variant_tables.py"
+  vertrags_root: "branch-hub/9dots-wargame-system/wiki-vertrags-master/05-vertraege/"
+  klauseln_root: "branch-hub/9dots-wargame-system/wiki-vertrags-master/06-klausel-begruendungen/"
+  audit_log: "branch-hub/audit/df-const-auto-expansion.jsonl"
+
+generation:
+  tiers_per_konst: 5            # Tier-1 bis Tier-5
+  klauseln_per_konst: 50
+  skeleton_only: true           # Phase-1: nur Skelett, keine Inhalte
+  overwrite_existing: false
