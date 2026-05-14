@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>DF_BASE_DIR</key>
+		<string>/Users/make/Library/CloudStorage/GoogleDrive-m.e.o.kemmer@gmail.com/Meine Ablage/Claude-Knowledge-System</string>
+		<key>DF_ENV_TAG</key>
+		<string>prod</string>
+		<key>PATH</key>
+		<string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+	</dict>
+	<key>Label</key>
+	<string>com.kemmer.df-const-auto-expansion</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/env</string>
+		<string>python3</string>
+		<string>/Users/make/Projects/dark-factories/df-const-auto-expansion/src/engine.py</string>
+	</array>
+	<key>RunAtLoad</key>
+	<false/>
+	<key>StandardErrorPath</key>
+	<string>/tmp/df-const-auto-expansion.stderr.log</string>
+	<key>StandardOutPath</key>
+	<string>/tmp/df-const-auto-expansion.stdout.log</string>
+	<key>StartCalendarInterval</key>
+	<array>
+		<dict>
+			<key>Hour</key>
+			<integer>3</integer>
+			<key>Minute</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>Hour</key>
+			<integer>15</integer>
+			<key>Minute</key>
+			<integer>0</integer>
+		</dict>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/make/Projects/dark-factories/df-const-auto-expansion</string>
+</dict>
+</plist>

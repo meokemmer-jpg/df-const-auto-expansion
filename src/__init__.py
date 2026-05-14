@@ -1,0 +1,2 @@
+# DF-CONST-AUTO-EXPANSION [CRUX-MK]
+__version__ = "0.1.0-PHASE-1"
