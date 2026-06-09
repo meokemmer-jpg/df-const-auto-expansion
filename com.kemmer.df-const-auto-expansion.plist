@@ -15,8 +15,7 @@
 	<string>com.kemmer.df-const-auto-expansion</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/bin/env</string>
-		<string>python3</string>
+		<string>/opt/homebrew/bin/python3</string>
 		<string>/Users/make/Projects/dark-factories/df-const-auto-expansion/src/engine.py</string>
 	</array>
 	<key>RunAtLoad</key>
