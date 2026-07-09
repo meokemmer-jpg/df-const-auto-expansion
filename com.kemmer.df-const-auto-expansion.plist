@@ -21,9 +21,9 @@
 	<key>RunAtLoad</key>
 	<false/>
 	<key>StandardErrorPath</key>
-	<string>/tmp/df-const-auto-expansion.stderr.log</string>
+	<string>/Users/make/Library/Logs/dark-factories/com.kemmer.df-const-auto-expansion.err.log</string>
 	<key>StandardOutPath</key>
-	<string>/tmp/df-const-auto-expansion.stdout.log</string>
+	<string>/Users/make/Library/Logs/dark-factories/com.kemmer.df-const-auto-expansion.log</string>
 	<key>StartCalendarInterval</key>
 	<array>
 		<dict>
