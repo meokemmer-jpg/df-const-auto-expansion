@@ -1,9 +1,9 @@
 {
   "df": "df-const-auto-expansion",
-  "ts": "2026-07-10T01:04:54.033525+00:00",
+  "ts": "2026-07-10T02:57:53.651393+00:00",
   "maturity": "TESTED",
   "maturity_level": 4,
   "evidence_grade": 4,
-  "wargame_verdict": null,
+  "wargame_verdict": "CONDITIONAL",
   "crux": "[CRUX-MK]"
 }
